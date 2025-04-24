@@ -1,0 +1,113 @@
+﻿@using Contoso.Store.Entities
+@model List<Incident>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Incident Dashboard";
+
+    var currentPage = ViewBag.CurrentPage as int? ?? 1;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
+}
+
+<div class="row">
+    <div class="col-10">
+        <h1 class="mb-4">Incident Dashboard</h1>
+    </div>
+    <div class="col-2">
+        <div class="d-flex justify-content-end mt-3">
+            <button id="generateReport" class="btn btn-primary">Generate Report</button>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">No incidents found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col" class="text-center">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col" class="text-center">Type</th>
+                    <th scope="col" class="text-center">Created</th>
+                    <th scope="col" class="text-center">Attachments</th>
+                    <th class="text-center">
+                        <input type="checkbox" id="selectAll" class="form-check-input" />
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var incident = Model[i];
+                    <tr>
+                        <td class="text-center">@(i + 1)</td>
+                        <td>
+                            <a href="/Home/Details/@incident.Id">@incident.Name</a>
+                        </td>
+                        <td class="text-center">@incident.Type</td>
+                        <td class="text-center">@incident.CreatedDate.ToShortDateString()</td>
+                        <td class="text-center">@incident.Attachments.Count</td>
+                        <td class="text-center">
+                            <input type="checkbox" class="form-check-input" name="selectedIncident" value="@incident.Id" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage - 1)">Previous</a>
+                </li>
+
+                <!-- Always show first page -->
+                <li class="page-item @(currentPage == 1 ? "active" : "")">
+                    <a class="page-link" href="?page=1">1</a>
+                </li>
+
+                @if (currentPage > 3)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+
+                @for (int i = currentPage - 1; i <= currentPage + 1; i++)
+                {
+                    if (i > 1 && i < totalPages)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")">
+                            <a class="page-link" href="?page=@i">@i</a>
+                        </li>
+                    }
+                }
+
+                @if (currentPage < totalPages - 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+
+                @if (totalPages > 1)
+                {
+                    <li class="page-item @(currentPage == totalPages ? "active" : "")">
+                        <a class="page-link" href="?page=@totalPages">@totalPages</a>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?page=@(currentPage + 1)">Next</a>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+}
+
+@section scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="~/js/real-time.js"></script>
+}

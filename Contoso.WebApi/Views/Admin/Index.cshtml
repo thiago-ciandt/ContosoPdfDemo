@@ -1,0 +1,111 @@
+﻿@using Contoso.Tracking.Enums
+@using Contoso.Tracking.Models
+@model List<ReportJob>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admin - Report Monitor";
+    var avg = ViewBag.AverageTime as TimeSpan?;
+}
+
+<h2 class="mb-4">Report Monitor</h2>
+
+@if (avg.HasValue)
+{
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-bg-light shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">⏱ Avg. Generation Time</h6>
+                    <h4 class="card-text">
+                        @(avg.HasValue ? $"{avg.Value.TotalSeconds:0.##}s" : "-")
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-light shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">📦 Avg. File Size</h6>
+                    <h4 class="card-text">
+                        @(ViewBag.AverageSizeMb is double avgSize ? $"{avgSize:0.00} MB" : "-")
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-light shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">📊 Total MB Generated</h6>
+                    <h4 class="card-text">
+                        @(ViewBag.TotalSizeMb is double totalSize ? $"{totalSize:0.00} MB" : "-")
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<table class="table table-bordered align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Job ID</th>
+            <th class="text-center">Incidents</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Progress</th>
+            <th class="text-center">Requested</th>
+            <th class="text-center">Completed</th>
+            <th class="text-center">Time Taken</th>
+            <th class="text-center">Finalization</th>
+            <th class="text-center">Size</th>
+            <th class="text-center">Download</th>
+            <th>Error</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var job in Model)
+        {
+            <tr>
+                <td><code>@job.JobId</code></td>
+                <td class="text-center">@job.IncidentIds.Count</td>
+                <td class="text-center">
+                    <span class="badge bg-@GetBadgeClass(job.Status)">
+                        @job.Status.ToString()
+                    </span>
+                </td>
+                <td class="text-center">
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-@GetBadgeClass(job.Status)" role="progressbar" style="width: @job.Progress%" aria-valuenow="@job.Progress" aria-valuemin="0" aria-valuemax="100">
+                            @job.Progress%
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center">@job.RequestedAt.ToLocalTime().ToString("HH:mm:ss")</td>
+                <td class="text-center">@(job.CompletedAt?.ToLocalTime().ToString("HH:mm:ss") ?? "-")</td>
+                <td class="text-center">@(job.Duration?.TotalSeconds.ToString("0.##") ?? "-")s</td>
+                <td class ="text-center">@(job.FinalizationDuration?.TotalSeconds.ToString("0.##") ?? "-")s</td>
+                <td class="text-center">@(job.FileSizeMb?.ToString("0.00") ?? "-") MB</td>
+                <td class="text-center">
+                    @if (!string.IsNullOrWhiteSpace(job.DownloadUrl))
+                    {
+                        <a href="@job.DownloadUrl" class="btn btn-sm btn-success" target="_blank">Download</a>
+                    }
+                </td>
+                <td class="text-danger">@job.ErrorMessage</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@functions {
+    private string GetBadgeClass(ReportJobStatus status)
+    {
+        return status switch
+        {
+            ReportJobStatus.Pending => "secondary",
+            ReportJobStatus.InProgress => "info",
+            ReportJobStatus.Completed => "success",
+            ReportJobStatus.Failed => "danger",
+            _ => "dark"
+        };
+    }
+}

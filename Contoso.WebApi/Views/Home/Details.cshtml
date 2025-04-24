@@ -1,0 +1,37 @@
+﻿@model Contoso.Store.Entities.Incident
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Incident Details";
+}
+
+<h2 class="mb-3">@Model.Name</h2>
+
+<div class="mb-4">
+    <p><strong>Type:</strong> @Model.Type</p>
+    <p><strong>Created on:</strong> @Model.CreatedDate.ToString("yyyy-MM-dd")</p>
+    <p><strong>Description:</strong> @Model.Description</p>
+</div>
+
+@if (Model.Attachments?.Any() ?? false)
+{
+    <h4>Attachments</h4>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var attachment in Model.Attachments)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    <img src="~/images/@attachment.FileName" class="card-img-top" alt="@attachment.Title" />
+                    <div class="card-body">
+                        <h5 class="card-title">@attachment.Title</h5>
+                        <p class="card-text">@attachment.Description</p>
+                        <p class="text-muted"><small>@attachment.CreateDate.ToString("g")</small></p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">This incident has no attachments.</div>
+}

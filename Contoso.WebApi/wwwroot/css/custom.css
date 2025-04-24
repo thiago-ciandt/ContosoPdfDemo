@@ -1,0 +1,25 @@
+﻿.report-progress-bar {
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-left: 5px solid #0d6efd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.report-progress-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.report-progress-footer {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.report-progress-bar.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
