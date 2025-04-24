@@ -3,6 +3,7 @@ using Constoso.Orchestration.Interfaces;
 using Constoso.Orchestration.Services;
 using Contoso.Domain.Interfaces;
 using Contoso.Domain.Services;
+using Contoso.Orchestration.Interfaces;
 using Contoso.Pdf.Interfaces;
 using Contoso.Pdf.Services;
 using Contoso.Store.Runner;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<IPdfGenerator, PdfGenerator>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IEventDispatcher, InMemoryEventDispatcher>();
 builder.Services.AddScoped<IReportProgressNotifier, ReportProgressNotifier>();
+builder.Services.AddScoped<IAdminNotifier, AdminNotifier>();
 builder.Services.AddHostedService<ReportWorkerService>();
 
 // Tracker
@@ -38,6 +40,7 @@ builder.Services.AddSingleton(incidents);
 var app = builder.Build();
 
 app.MapHub<ReportHub>("/reportHub");
+app.MapHub<AdminHub>("/adminHub");
 
 if (!app.Environment.IsDevelopment())
 {

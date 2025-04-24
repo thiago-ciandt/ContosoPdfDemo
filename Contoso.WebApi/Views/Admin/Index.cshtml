@@ -16,7 +16,7 @@
             <div class="card text-bg-light shadow-sm h-100">
                 <div class="card-body">
                     <h6 class="card-title text-muted">⏱ Avg. Generation Time</h6>
-                    <h4 class="card-text">
+                    <h4 class="card-text" id="avg-time">
                         @(avg.HasValue ? $"{avg.Value.TotalSeconds:0.##}s" : "-")
                     </h4>
                 </div>
@@ -26,7 +26,7 @@
             <div class="card text-bg-light shadow-sm h-100">
                 <div class="card-body">
                     <h6 class="card-title text-muted">📦 Avg. File Size</h6>
-                    <h4 class="card-text">
+                    <h4 class="card-text" id="avg-size">
                         @(ViewBag.AverageSizeMb is double avgSize ? $"{avgSize:0.00} MB" : "-")
                     </h4>
                 </div>
@@ -36,7 +36,7 @@
             <div class="card text-bg-light shadow-sm h-100">
                 <div class="card-body">
                     <h6 class="card-title text-muted">📊 Total MB Generated</h6>
-                    <h4 class="card-text">
+                    <h4 class="card-text" id="total-size">
                         @(ViewBag.TotalSizeMb is double totalSize ? $"{totalSize:0.00} MB" : "-")
                     </h4>
                 </div>
@@ -64,7 +64,7 @@
     <tbody>
         @foreach (var job in Model)
         {
-            <tr>
+            <tr id="row-@job.JobId">
                 <td><code>@job.JobId</code></td>
                 <td class="text-center">@job.IncidentIds.Count</td>
                 <td class="text-center">
@@ -82,7 +82,7 @@
                 <td class="text-center">@job.RequestedAt.ToLocalTime().ToString("HH:mm:ss")</td>
                 <td class="text-center">@(job.CompletedAt?.ToLocalTime().ToString("HH:mm:ss") ?? "-")</td>
                 <td class="text-center">@(job.Duration?.TotalSeconds.ToString("0.##") ?? "-")s</td>
-                <td class ="text-center">@(job.FinalizationDuration?.TotalSeconds.ToString("0.##") ?? "-")s</td>
+                <td class="text-center">@(job.FinalizationDuration?.TotalSeconds.ToString("0.##") ?? "-")s</td>
                 <td class="text-center">@(job.FileSizeMb?.ToString("0.00") ?? "-") MB</td>
                 <td class="text-center">
                     @if (!string.IsNullOrWhiteSpace(job.DownloadUrl))
@@ -108,4 +108,10 @@
             _ => "dark"
         };
     }
+}
+
+@section scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="~/js/admin-real-time.js"></script>
+    <script src="~/js/update-admin-row.js"></script>
 }

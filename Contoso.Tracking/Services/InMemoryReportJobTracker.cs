@@ -55,6 +55,8 @@ namespace Contoso.Tracking.Services
             }
         }
 
-        public List<ReportJob> GetAll() => _jobs.Values.OrderByDescending(j => j.RequestedAt).ToList();
+        public ReportJob GetById(Guid jobId) => _jobs.Values.FirstOrDefault(j => j.JobId == jobId)!;
+
+        public List<ReportJob> GetAll() => _jobs.Values.OrderByDescending(j => j.RequestedAt).ToList();        
     }
 }

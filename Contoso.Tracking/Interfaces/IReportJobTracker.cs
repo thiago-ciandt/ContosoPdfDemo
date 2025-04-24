@@ -1,5 +1,4 @@
 ﻿using Contoso.Tracking.Models;
-using System.Drawing;
 
 namespace Contoso.Tracking.Interfaces
 {
@@ -11,6 +10,7 @@ namespace Contoso.Tracking.Interfaces
         void Fail(Guid jobId, string errorMessage);
         void SetFileSize(Guid jobId, long fileSizeBytes);
         void MarkFinalizationStart(Guid jobId);
+        ReportJob GetById(Guid jobId);
         List<ReportJob> GetAll();
     }
 }

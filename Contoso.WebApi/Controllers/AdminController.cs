@@ -1,5 +1,6 @@
 ﻿using Contoso.Tracking.Enums;
 using Contoso.Tracking.Interfaces;
+using Contoso.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contoso.WebApi.Controllers
@@ -38,6 +39,31 @@ namespace Contoso.WebApi.Controllers
             ViewBag.TotalSizeMb = sizes.Sum();
 
             return View(jobs);
+        }
+
+        [HttpGet("/admin/stats")]
+        public IActionResult GetStats()
+        {
+            var jobs = _tracker.GetAll();
+
+            var durations = jobs
+                .Where(j => j.Status == ReportJobStatus.Completed && j.CompletedAt.HasValue)
+                .Select(j => (j.CompletedAt!.Value - j.RequestedAt).TotalSeconds)
+                .ToList();
+
+            var sizes = jobs
+                .Where(j => j.Status == ReportJobStatus.Completed && j.FileSizeBytes.HasValue)
+                .Select(j => j.FileSizeBytes.Value / 1024d / 1024d)
+                .ToList();
+
+            var dto = new AdminStatsDto
+            {
+                AverageTimeSeconds = durations.Any() ? durations.Average() : (double?)null,
+                AverageSizeMb = sizes.Any() ? sizes.Average() : (double?)null,
+                TotalSizeMb = sizes.Sum()
+            };
+
+            return Ok(dto);
         }
     }
 }
